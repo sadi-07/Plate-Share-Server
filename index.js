@@ -74,6 +74,33 @@ async function run() {
         res.send(result);
     });
 
+    
+    // Featured Foods
+    app.get("/featuredFoods", async (req, res) => {
+      try {
+        const pipeline = [
+      {
+        $addFields: { qtyMatch: {$regexFind: { input: "$food_quantity", regex: "\\d+" }}}
+      },
+      
+      {
+        $addFields: { qtyNumber: { $cond: [
+              { $gt: ["$qtyMatch.match", null] },
+              { $toInt: "$qtyMatch.match" },
+              0 ]}}
+      },
+      { $sort: { qtyNumber: -1, created_at: -1 } },
+      { $limit: 6 },
+      { $project: { qtyMatch: 0, qtyNumber: 0 } }
+    ];
+
+    const results = await foodCollection.aggregate(pipeline).toArray();
+    res.json(results);
+  } catch (err) {
+    res.status(500).json({ error: "Could not fetch featured foods" });
+  }
+});
+
 
     // post method
     app.post('/foods', async (req, res) => {
