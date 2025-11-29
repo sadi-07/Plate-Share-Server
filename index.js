@@ -39,29 +39,40 @@ async function run() {
 
     // Food Details
     app.get('/foods/:id', async (req, res) => {
-      const { id } = req.params;
-      const result = await foodCollection.findOne({ _id: new ObjectId(id)})
+        const { id } = req.params;
+        const result = await foodCollection.findOne({ _id: new ObjectId(id)})
 
-      res.send(result)
+        res.send(result)
     })
 
     // Manage My Foods
     app.get("/myFoods/:email", async (req, res) => {
-      const email = req.params.email;
-      const result = await foodCollection.find({ donators_email: email }).toArray();
+        const email = req.params.email;
+        const result = await foodCollection.find({ donators_email: email }).toArray();
   
-      res.send(result);
+        res.send(result);
     });
 
 
     // Delete My Food
     app.delete("/foods/:id", async (req, res) => {
-      const { id } = req.params;
-      const result = await foodCollection.deleteOne({ _id: new ObjectId(id) });
+        const { id } = req.params;
+        const result = await foodCollection.deleteOne({ _id: new ObjectId(id) });
       
-      res.send(result);
+        res.send(result);
     });
 
+    // Update My Foods
+    app.put('/foods/:id', async (req, res) => {
+        const { id } = req.params;
+        const update = req.body; // validate on server in production
+        const result = await foodCollection.updateOne(
+          { _id: new ObjectId(id) },
+          { $set: update }
+        );
+  
+        res.send(result);
+    });
 
 
     // post method
