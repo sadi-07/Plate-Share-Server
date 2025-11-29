@@ -30,19 +30,39 @@ async function run() {
     const foodCollection = db.collection('foods')
 
 
-    // get method
+    // Available Foods
     app.get('/foods', async (req, res) => {
         const result = await foodCollection.find().toArray()
 
         res.send(result)
     })
 
+    // Food Details
     app.get('/foods/:id', async (req, res) => {
       const { id } = req.params;
       const result = await foodCollection.findOne({ _id: new ObjectId(id)})
 
       res.send(result)
     })
+
+    // Manage My Foods
+    app.get("/myFoods/:email", async (req, res) => {
+      const email = req.params.email;
+      const result = await foodCollection.find({ donators_email: email }).toArray();
+  
+      res.send(result);
+    });
+
+
+    // Delete My Food
+    app.delete("/foods/:id", async (req, res) => {
+      const { id } = req.params;
+      const result = await foodCollection.deleteOne({ _id: new ObjectId(id) });
+      
+      res.send(result);
+    });
+
+
 
     // post method
     app.post('/foods', async (req, res) => {
