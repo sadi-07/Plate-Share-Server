@@ -127,13 +127,28 @@ async function run() {
           return res.status(400).send({ message: "Missing required fields" });
         }
 
+        // find the food item to get donator details
+        const food = await foodCollection.findOne({
+          _id: new ObjectId(requestData.foodId),
+        });
+
+        if (!food) {
+          return res.status(404).send({ message: "Food not found" });
+        }
+
+        // attach donator information to request
+        requestData.donators_email = food.donators_email;
+        requestData.donators_name = food.donators_name;
+        requestData.donators_image = food.donators_image;
+
         const result = await requestsCollection.insertOne(requestData);
 
-        res.send({ data: result });
+        res.send({ success: true, data: result });
       } catch (error) {
         res.status(500).send({ success: false, error: error.message });
       }
     });
+
 
 
     // My Requests
@@ -170,18 +185,16 @@ async function run() {
     });
 
 
-    // Delete Requests
-    app.patch("/requests/:id", async (req, res) => {
+    // Delete a Request
+    app.delete("/requests/:id", async (req, res) => {
       const id = req.params.id;
-      const updateData = req.body;
 
-      const result = await requestsCollection.updateOne(
-        { _id: new ObjectId(id) },
-        { $set: updateData }
-      );
+      const result = await requestsCollection.deleteOne({ _id: new ObjectId(id) });
 
       res.send(result);
     });
+
+    
 
 
 
