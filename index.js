@@ -24,7 +24,7 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    await client.connect();
+    // await client.connect();
 
     const db = client.db('plate-db')
     const foodCollection = db.collection('foods')
@@ -66,7 +66,7 @@ async function run() {
     // Update My Foods
     app.put('/foods/:id', async (req, res) => {
       const { id } = req.params;
-      const update = req.body; // validate on server in production
+      const update = req.body;
       const result = await foodCollection.updateOne(
         { _id: new ObjectId(id) },
         { $set: update }
@@ -115,8 +115,8 @@ async function run() {
       res.send(result)
     })
 
-    // ========================
-    // Request Section
+    
+    // Food Request Section
     // ========================
 
     app.post("/requests", async (req, res) => {
@@ -136,7 +136,6 @@ async function run() {
           return res.status(404).send({ message: "Food not found" });
         }
 
-        // attach donator information to request
         requestData.donators_email = food.donators_email;
         requestData.donators_name = food.donators_name;
         requestData.donators_image = food.donators_image;
@@ -204,7 +203,7 @@ async function run() {
 
 
 
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     //await client.close();
